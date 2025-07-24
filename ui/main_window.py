@@ -2,13 +2,14 @@ import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMessageBox
 from ui.zentao_export_page import ZentaoExportPage
 from ui.acceptance_filling_page import AcceptanceTestFillingPage
+from ui.ExcelTool import ExcelTool
 from ui.data_chart_page import ZentaoDataChartPage
 from core.settings_manager import SettingsManager
 
 class MainApplication(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("XD_自动化报告生成_V1.4")
+        self.setWindowTitle("XD_自动化报告生成_V1.6")
         self.setGeometry(100, 100, 900, 950)
 
         self.tabs = QTabWidget()
@@ -24,17 +25,17 @@ class MainApplication(QWidget):
     def _init_ui_pages(self):
         """Initializes and adds all sub-pages to the tab widget."""
         self.zentao_export_page = ZentaoExportPage(self)
-        self.acceptance_filling_page = AcceptanceTestFillingPage(self)
+        self.ExcelTool = ExcelTool()
         self.data_chart_page = ZentaoDataChartPage(self)
 
         self.tabs.addTab(self.zentao_export_page, "禅道自动化导出")
         self.tabs.addTab(self.data_chart_page, "禅道数据表单与验收图插入")
-        self.tabs.addTab(self.acceptance_filling_page, "验收测试结果填充")
+        self.tabs.addTab(self.ExcelTool, "验收测试结果填充")
 
     def _load_all_settings(self):
         """Loads settings for all tabs."""
         self.zentao_export_page.load_settings()
-        self.acceptance_filling_page.load_settings()
+        # self.acceptance_filling_page.load_settings()
         self.data_chart_page.load_settings()
 
     def closeEvent(self, event):
