@@ -1,8 +1,41 @@
 import os
+import sys
 from openpyxl import load_workbook
 from openpyxl.utils import range_boundaries
 import xlwings as xw
 import pandas as pd
+
+
+
+
+def find_row_by_fuzzy_column_value(file_path, key_column, key_value, target_columns):
+    wb = load_workbook(file_path, data_only=True)
+    sheet = wb.active
+
+    headers = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
+    header_index = {header: idx for idx, header in enumerate(headers)}
+
+    if key_column not in header_index:
+        raise ValueError(f"找不到列标题: {key_column}")
+    for col in target_columns:
+        if col not in header_index:
+            raise ValueError(f"找不到目标列标题: {col}")
+
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        cell_value = str(row[header_index[key_column]])
+        if key_value in cell_value:
+            return {col: row[header_index[col]] for col in target_columns}
+    return None
+
+
+def write_to_target_sheet(file_path, sheet_name, cell_map, data_dict):
+    wb = load_workbook(file_path)
+    if sheet_name not in wb.sheetnames:
+        raise ValueError(f"找不到工作表：{sheet_name}")
+    sheet = wb[sheet_name]
+    for key, cell in cell_map.items():
+        sheet[cell] = data_dict.get(key, "")
+    wb.save(file_path)
 
 def fill_excel_template_acceptance(template_path: str, data: dict, field_mapping: dict, sheet_name: str, log_callback=None):
     """
